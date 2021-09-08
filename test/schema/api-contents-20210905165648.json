@@ -1,0 +1,1 @@
+{"apiFields":[{"idValue":"g8ZUm5uLha","fieldId":"title","name":"タイトル","kind":"text","required":true,"isUnique":false},{"fieldId":"visible","name":"表示","kind":"boolean","required":false},{"fieldId":"keyword","name":"キーワード","kind":"relationList"},{"fieldId":"parent","name":"親記事","kind":"relation"},{"fieldId":"body","name":"本文","kind":"textArea","required":false}],"customFields":[]}
