@@ -277,28 +277,3 @@ export class MicroCMS<
       .catch(() => null) as ReturnType<typeof this.delete2>;
   }
 }
-
-type DateType = {
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string;
-  revisedAt: string;
-};
-type IdType = {
-  id: string;
-};
-type Marge<T, K extends keyof T = keyof T> = {
-  [P in K]: T[P];
-};
-
-type Structure<T, P> = T extends 'get'
-  ? Marge<Required<P> & DateType & IdType>
-  : Partial<DateType> & (T extends 'patch' ? Partial<P> : P);
-type Test<T> = Structure<T, { a: string; b: string }>;
-export interface EndPoints {
-  get: {
-    test: Test<'get'>;
-  };
-}
-
-type Test3 = Pick<EndPoints['get']['test'], 'id'>;
