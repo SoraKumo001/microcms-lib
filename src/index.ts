@@ -28,7 +28,7 @@ interface GetsOptions<T> {
 const convertQuery = (
   query:
     | {
-        [key: string]: string | ReadonlyArray<keyof any> | number | boolean | undefined;
+        [key: string]: string | ReadonlyArray<keyof unknown> | number | boolean | undefined;
       }
     | {}
 ) =>
@@ -210,7 +210,7 @@ export class MicroCMS<
       body: JSON.stringify(params),
     })
       .then(async (res) => (res.status === 201 ? (await res.json())['id'] : null))
-      .catch((e) => null) as ReturnType<typeof this.put>;
+      .catch(() => null) as ReturnType<typeof this.put>;
   }
   /**
    * Rewriting content

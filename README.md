@@ -4,6 +4,7 @@
 
 Export the MicroCMS schema file and save it in a folder.  
 Execute the command as follows to generate the TypeScript types.  
+[microcms-typescript]<https://www.npmjs.com/package/microcms-typescript>
 
 ```sh
 yarn add -D microcms-typescript
