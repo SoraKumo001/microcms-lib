@@ -3,15 +3,20 @@
 ## usage
 
 Export the MicroCMS schema file and save it in a folder.  
-Execute the command as follows to generate the TypeScript types.  
-[microcms-typescript]<https://www.npmjs.com/package/microcms-typescript>
+If you use [microcms-typescript](https://www.npmjs.com/package/microcms-typescript)
+ and execute the command as follows, TypeScript types will be generated.  
 
 ```sh
 yarn add -D microcms-typescript
-microcms-typescript test/schema test/types/cms-types.ts
+microcms-typescript schema types/cms-types.ts
 ```
 
 Import the MicroCMS class and set the EndPoints.  
+
+```ts
+import type { EndPoints } from './types/cms-types';
+const cms = new MicroCMS<EndPoints>({service,...keys})
+```
 
 ## Functions of the MicroCMS class
 
@@ -34,31 +39,32 @@ interface GetsOptions<T> {
   depth?: number;
   globalKey?: boolean;
 }
-
-// Constructor
-constructor(options: {
-    service: string;
-    apiKey?: string;
-    apiWriteKey?: string;
-    apiGlobalKey?: string;
-  })
-// Get a single content
-get(endpoint:string ,id: string,options: GetOptions) : Promise<Contents>
-// Acquiring multiple contents
-gets(endpoint:string ,id: string,options: GetsOptions) : Promise<{
-  contents: Contents[];
-  totalCount: number;
-  offset: number;
-  limit: number;
-}>
-// Create new content
-post(endpoint: string,params: Contents) : Promise<ID>
-// Create a new content with ID
-put(endpoint: string, id: string, params: Contents) : Promise<ID>
-// Rewriting content
-patch(endpoint: string, id: string, params: Contents) : Promise<ID>
-// Deleting content
-del(id: string) : Promise<boolean>
+class MicroCMS {
+  // Constructor
+  constructor(options: {
+      service: string;
+      apiKey?: string;
+      apiWriteKey?: string;
+      apiGlobalKey?: string;
+    });
+  // Get a single content
+  get(endpoint:string ,id: string,options: GetOptions) : Promise<Contents>;
+  // Acquiring multiple contents
+  gets(endpoint:string ,id: string,options: GetsOptions) : Promise<{
+    contents: Contents[];
+    totalCount: number;
+    offset: number;
+    limit: number;
+  }>;
+  // Create new content
+  post(endpoint: string,params: Contents) : Promise<ID>;
+  // Create a new content with ID
+  put(endpoint: string, id: string, params: Contents) : Promise<ID>;
+  // Rewriting content
+  patch(endpoint: string, id: string, params: Contents) : Promise<ID>;
+  // Deleting content
+  del(id: string) : Promise<boolean>;
+}
 ```
 
 ## sample
