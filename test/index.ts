@@ -35,7 +35,7 @@ const main = async () => {
     for (let i = 0; i < result.contents.length; i++) {
       const ps = new Set();
       const p = cms
-        .delete('contents', result.contents[i]['id'])
+        .del('contents', result.contents[i]['id'])
         .then((v) => (v ? console.log(i) : false));
       ps.add(p);
       if (ps.size > 20) {

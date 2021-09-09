@@ -1,7 +1,7 @@
 {
   "name": "microcms-lib",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc -b src",
@@ -21,5 +21,23 @@
     "prettier": "^2.3.2",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
-  }
+  },
+  "description": "Export the MicroCMS schema file and save it in a folder.  \r Execute the command as follows to generate the TypeScript types.",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoraKumo001/microcms-lib.git"
+  },
+  "keywords": [
+    "microcms",
+    "typescript",
+    "fetch"
+  ],
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/SoraKumo001/microcms-lib/issues"
+  },
+  "homepage": "https://github.com/SoraKumo001/microcms-lib#readme"
 }

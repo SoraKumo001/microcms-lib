@@ -12,6 +12,56 @@ microcms-typescript test/schema test/types/cms-types.ts
 
 Import the MicroCMS class and set the EndPoints.  
 
+## Functions of the MicroCMS class
+
+```ts
+interface GetOptions<T> {
+  draftKey?: string;
+  fields?: ReadonlyArray<T>;
+  depth?: number;
+  globalKey?: boolean;
+}
+interface GetsOptions<T> {
+  draftKey?: string;
+  limit?: number;
+  offset?: number;
+  orders?: string;
+  q?: string;
+  fields?: T[];
+  ids?: string;
+  filters?: string;
+  depth?: number;
+  globalKey?: boolean;
+}
+
+// Constructor
+constructor(options: {
+    service: string;
+    apiKey?: string;
+    apiWriteKey?: string;
+    apiGlobalKey?: string;
+  })
+// Get a single content
+get(endpoint:string ,id: string,options: GetOptions) : Promise<Contents>
+// Acquiring multiple contents
+gets(endpoint:string ,id: string,options: GetsOptions) : Promise<{
+  contents: Contents[];
+  totalCount: number;
+  offset: number;
+  limit: number;
+}>
+// Create new content
+post(endpoint: string,params: Contents) : Promise<ID>
+// Create a new content with ID
+put(endpoint: string, id: string, params: Contents) : Promise<ID>
+// Rewriting content
+patch(endpoint: string, id: string, params: Contents) : Promise<ID>
+// Deleting content
+del(id: string) : Promise<boolean>
+```
+
+## sample
+
 ```ts
 import type { EndPoints } from './types/cms-types';
 import { MicroCMS } from '../src/index';
@@ -51,7 +101,7 @@ const main = async () => {
     for (let i = 0; i < result.contents.length; i++) {
       const ps = new Set();
       const p = cms
-        .delete('contents', result.contents[i]['id'])
+        .del('contents', result.contents[i]['id'])
         .then((v) => (v ? console.log(i) : false));
       ps.add(p);
       if (ps.size > 20) {
