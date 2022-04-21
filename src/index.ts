@@ -50,6 +50,7 @@ export class MicroCMS<
   P extends { [key in K]: T[keyof T][K] } = T[keyof T],
   K extends keyof T[keyof T] = keyof T[keyof T]
 > {
+  private serviceUrl?: string;
   /**
    * Creates an instance of MicroCMS.
    * @param {} options
@@ -65,12 +66,15 @@ export class MicroCMS<
    */
   constructor(
     private options: {
-      service: string;
+      service?: string;
       apiKey?: string;
       apiWriteKey?: string;
       apiGlobalKey?: string;
+      url?: string;
     }
-  ) {}
+  ) {
+    this.serviceUrl = options.url || `https://${options.service || ''}.microcms.io/api/v1/`;
+  }
 
   /**
    * Get a single content
@@ -96,13 +100,13 @@ export class MicroCMS<
   ): Promise<Pick<T['get'][E], F> | null> {
     const { globalKey, ...o } = options;
     const queryString = options && convertQuery(o);
-    const { service, apiKey, apiGlobalKey } = this.options;
+    const { apiKey, apiGlobalKey } = this.options;
     if (!apiKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}/${id}${queryString}`, {
+    return fetch(`${this.serviceUrl}${endpoint}${id}${queryString}`, {
       headers:
         globalKey && apiGlobalKey
-          ? { 'X-API-KEY': apiKey, 'X-GLOBAL-DRAFT-KEY': apiGlobalKey }
-          : { 'X-API-KEY': apiKey },
+          ? { 'X-MICROCMS-API-KEY': apiKey, 'X-GLOBAL-DRAFT-KEY': apiGlobalKey }
+          : { 'X-MICROCMS-API-KEY': apiKey },
     })
       .then(async (res) => (res.status === 200 ? res.json() : null))
       .catch(() => null);
@@ -143,13 +147,13 @@ export class MicroCMS<
   ): Promise<MicroCMSResultType<Pick<T['get'][E], F>> | null> {
     const { globalKey, ...o } = options;
     const queryString = options && convertQuery(o);
-    const { service, apiKey, apiGlobalKey } = this.options;
+    const { apiKey, apiGlobalKey } = this.options;
     if (!apiKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}${queryString}`, {
+    return fetch(`${this.serviceUrl}${endpoint}${queryString}`, {
       headers:
         globalKey && apiGlobalKey
-          ? { 'X-API-KEY': apiKey, 'X-GLOBAL-DRAFT-KEY': apiGlobalKey }
-          : { 'X-API-KEY': apiKey },
+          ? { 'X-MICROCMS-API-KEY': apiKey, 'X-GLOBAL-DRAFT-KEY': apiGlobalKey }
+          : { 'X-MICROCMS-API-KEY': apiKey },
     })
       .then(async (res) => (res.status === 200 ? res.json() : null))
       .catch(() => null);
@@ -177,9 +181,9 @@ export class MicroCMS<
       revisedAt?: string;
     }
   ): Promise<string | null> {
-    const { service, apiWriteKey } = this.options;
+    const { apiWriteKey } = this.options;
     if (!apiWriteKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}`, {
+    return fetch(`${this.serviceUrl}${endpoint}`, {
       method: 'post',
       headers: { 'X-WRITE-API-KEY': apiWriteKey, 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -202,9 +206,9 @@ export class MicroCMS<
     id: string | undefined,
     params: T['put'][E]
   ): Promise<string | null> {
-    const { service, apiWriteKey } = this.options;
+    const { apiWriteKey } = this.options;
     if (!apiWriteKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}/${id}`, {
+    return fetch(`${this.serviceUrl}${endpoint}/${id}`, {
       method: 'put',
       headers: { 'X-WRITE-API-KEY': apiWriteKey, 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -223,9 +227,9 @@ export class MicroCMS<
    * @memberof MicroCMS
    */
   async patch<E extends K>(endpoint: E, id: string, params: T['patch'][E]): Promise<string | null> {
-    const { service, apiWriteKey } = this.options;
+    const { apiWriteKey } = this.options;
     if (!apiWriteKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}/${id}`, {
+    return fetch(`${this.serviceUrl}${endpoint}/${id}`, {
       method: 'patch',
       headers: { 'X-WRITE-API-KEY': apiWriteKey, 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -243,9 +247,9 @@ export class MicroCMS<
    * @memberof MicroCMS
    */
   async del<E extends K>(endpoint: E, id: string): Promise<boolean> {
-    const { service, apiWriteKey } = this.options;
+    const { apiWriteKey } = this.options;
     if (!apiWriteKey) return false;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}/${id}`, {
+    return fetch(`${this.serviceUrl}${endpoint}/${id}`, {
       method: 'delete',
       headers: { 'X-WRITE-API-KEY': apiWriteKey, 'Content-Type': 'application/json' },
     })
@@ -295,16 +299,28 @@ export class MicroCMS<
   > {
     const { globalKey, ...o } = options;
     const queryString = options && convertQuery(o);
-    const { service, apiKey, apiGlobalKey } = this.options;
+    const { apiKey, apiGlobalKey } = this.options;
     if (!apiKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}/${id}${queryString}`, {
+    return fetch(`${this.serviceUrl}${endpoint}/${id}${queryString}`, {
       headers:
         globalKey && apiGlobalKey
-          ? { 'X-API-KEY': apiKey, 'X-GLOBAL-DRAFT-KEY': apiGlobalKey }
-          : { 'X-API-KEY': apiKey },
+          ? { 'X-MICROCMS-API-KEY': apiKey, 'X-GLOBAL-DRAFT-KEY': apiGlobalKey }
+          : { 'X-MICROCMS-API-KEY': apiKey },
     })
-      .then(async (res) => ({ code: res.status, body: await res.json() }))
-      .catch(() => null) as T['get'][K] | null;
+      .then(async (res) => ({
+        code: res.status,
+        body: await res.json().catch(() => ({
+          message: 'error',
+        })),
+      }))
+      .catch((e) => console.error(e)) as Promise<
+      | {
+          code: 200;
+          body: T['get'][E];
+        }
+      | { code: 401; body: { message: string } }
+      | null
+    >;
   }
   /**
    *
@@ -344,21 +360,25 @@ export class MicroCMS<
   ) {
     const { globalKey, ...o } = options;
     const queryString = options && convertQuery(o);
-    const { service, apiKey, apiGlobalKey } = this.options;
+    const { apiKey, apiGlobalKey } = this.options;
     if (!apiKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}${queryString}`, {
+    return fetch(`${this.serviceUrl}${endpoint}${queryString}`, {
       headers:
         globalKey && apiGlobalKey
-          ? { 'X-API-KEY': apiKey, 'X-GLOBAL-DRAFT-KEY': apiGlobalKey }
-          : { 'X-API-KEY': apiKey },
+          ? { 'X-MICROCMS-API-KEY': apiKey, 'X-GLOBAL-DRAFT-KEY': apiGlobalKey }
+          : { 'X-MICROCMS-API-KEY': apiKey },
     })
-      .then(async (res) => ({ code: res.status, body: await res.json() }))
-      .catch(() => null) as Promise<
+      .then(async (res) => ({
+        code: res.status,
+        body: await res.json().catch(async () => ({ message: 'error' })),
+      }))
+      .catch((e) => console.error(e)) as Promise<
       | {
           code: 200;
           body: MicroCMSResultType<Pick<T['get'][E], F>>;
         }
       | { code: 401; body: { message: string } }
+      | { code: 404 | 500; body: { message: string } }
       | null
     >;
   }
@@ -389,9 +409,9 @@ export class MicroCMS<
   ): Promise<
     { code: 400; body: { message: string } } | { code: 201; body: { id: string } } | null
   > {
-    const { service, apiWriteKey } = this.options;
+    const { apiWriteKey } = this.options;
     if (!apiWriteKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}`, {
+    return fetch(`${this.serviceUrl}${endpoint}`, {
       method: 'post',
       headers: { 'X-WRITE-API-KEY': apiWriteKey, 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -418,9 +438,9 @@ export class MicroCMS<
   ): Promise<
     { code: 400; body: { message: string } } | { code: 201; body: { id: string } } | null
   > {
-    const { service, apiWriteKey } = this.options;
+    const { apiWriteKey } = this.options;
     if (!apiWriteKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}/${id}`, {
+    return fetch(`${this.serviceUrl}${endpoint}/${id}`, {
       method: 'put',
       headers: { 'X-WRITE-API-KEY': apiWriteKey, 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -447,9 +467,9 @@ export class MicroCMS<
   ): Promise<
     { code: 400; body: { message: string } } | { code: 200; body: { id: string } } | null
   > {
-    const { service, apiWriteKey } = this.options;
+    const { apiWriteKey } = this.options;
     if (!apiWriteKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}/${id}`, {
+    return fetch(`${this.serviceUrl}${endpoint}/${id}`, {
       method: 'patch',
       headers: { 'X-WRITE-API-KEY': apiWriteKey, 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -474,9 +494,9 @@ export class MicroCMS<
   ): Promise<
     { code: 400; body: { message: string } } | { code: 202; body: { id: string } } | null
   > {
-    const { service, apiWriteKey } = this.options;
+    const { apiWriteKey } = this.options;
     if (!apiWriteKey) return null;
-    return fetch(`https://${service}.microcms.io/api/v1/${endpoint}/${id}`, {
+    return fetch(`${this.serviceUrl}${endpoint}/${id}`, {
       method: 'delete',
       headers: { 'X-WRITE-API-KEY': apiWriteKey, 'Content-Type': 'application/json' },
     })
